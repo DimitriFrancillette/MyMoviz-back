@@ -1,16 +1,18 @@
 var express = require('express');
-const { response } = require('../app');
 var router = express.Router();
+const fetch = require('node-fetch');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
-router.get('/movies', function(req, res, next) {
-  fetch(``)
-  .then(response => response.json())
-  .then(data => {console.log(data)})
+/* GET movies to discover fromt TMDB API. */
+router.get('/movies', function (req, res, next) {
+  fetch(`https://api.themoviedb.org/3/discover/movie/?api_key=${TMDB_API_KEY}`)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      res.json({movies: data.results});
+    })
+    .catch(err => console.error('error:' + err));
 });
 
 module.exports = router;
