@@ -5,11 +5,11 @@ const fetch = require('node-fetch');
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
 /* GET movies to discover from TMDB API. */
-router.get('/movies', function (req, res, next) {
-  fetch(`https://api.themoviedb.org/3/discover/movie/?api_key=${TMDB_API_KEY}`)
+router.get('/movies', function (req, res) {
+  fetch(`https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&language=fr-FR&sort_by=popularity.desc&include_adult=false&include_video=false&with_watch_monetization_types=flatrate&region=FR`)
     .then(response => response.json())
     .then(data => {
-      res.json({movies: data.results});
+      res.json({ movies: data.results });
     })
     .catch(err => console.error('error:' + err));
 });
@@ -18,7 +18,7 @@ router.get('/movies', function (req, res, next) {
 router.get('/movie/:movieId', function (req, res) {
   const { movieId } = req.params;
 
-  fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}`)
+  fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}&append_to_response=credits`)
     .then(response => response.json())
     .then(data => {
       const movieInfo = {
@@ -32,30 +32,37 @@ router.get('/movie/:movieId', function (req, res) {
         vote_count: data.vote_count,
       };
 
-      fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`)
-      .then(response => response.json())
-      .then(data => {
-        const mainCast = [];
-        const mainCrew = [];
+      const mainCast = [];
+      const mainCrew = [];
 
-        for (let i = 0; i < 3; i++) {
-          mainCast.push(data.cast[i])
+      for (let i = 0; i < 3; i++) {
+        mainCast.push(data.credits.cast[i])
+      }
+
+      for (const obj of data.credits.crew) {
+        if (obj.department === "Directing" && obj.job === "Director") {
+          mainCrew.push(obj);
         }
-        
-        for (const obj of data.crew) {
-          if (obj.department === "Directing" && obj.job === "Director") {
-            mainCrew.push(obj);
-          }
-        }
+      }
 
-        movieInfo.cast = mainCast;
-        movieInfo.crew = mainCrew;
+      movieInfo.cast = mainCast;
+      movieInfo.crew = mainCrew;
 
-        res.json({movieInfo});
-      })
+      res.json(movieInfo)
 
     })
     .catch(err => console.error('error:' + err));
 });
+
+/* GET movies by name from TMDB API. */
+//todo
+// router.get('/movie/:name', function (req, res) {
+//   fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=fr-FR&query=${state.movies.value}&page=${state.movies.changeSearchPageAllFilm}&include_adult=false`)
+//     .then(response => response.json())
+//     .then(data => {
+//       res.json(data);
+//     })
+//     .catch(err => console.error('error:' + err));
+// });
 
 module.exports = router;
