@@ -18,7 +18,7 @@ router.get('/movies', function (req, res) {
 router.get('/movie/:movieId', function (req, res) {
   const { movieId } = req.params;
 
-  fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}&append_to_response=credits`)
+  fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}&language=fr-FR&append_to_response=credits`)
     .then(response => response.json())
     .then(data => {
       const movieInfo = {
@@ -55,14 +55,16 @@ router.get('/movie/:movieId', function (req, res) {
 });
 
 /* GET movies by name from TMDB API. */
-//todo
-// router.get('/movie/:name', function (req, res) {
-//   fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=fr-FR&query=${state.movies.value}&page=${state.movies.changeSearchPageAllFilm}&include_adult=false`)
-//     .then(response => response.json())
-//     .then(data => {
-//       res.json(data);
-//     })
-//     .catch(err => console.error('error:' + err));
-// });
+router.get('/search/:name', function (req, res) {
+  //format du name : "fight+club"
+  const { name } = req.params;
+
+  fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=fr-FR&query=${name}&include_adult=false`)
+    .then(response => response.json())
+    .then(data => {
+      res.json(data);
+    })
+    .catch(err => console.error('error:' + err));
+});
 
 module.exports = router;
