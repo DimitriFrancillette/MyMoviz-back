@@ -35,7 +35,7 @@ router.get('/movie/:movieId', function (req, res) {
       const mainCast = [];
       const mainCrew = [];
 
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 10; i++) {
         mainCast.push(data.credits.cast[i])
       }
 
@@ -56,7 +56,6 @@ router.get('/movie/:movieId', function (req, res) {
 
 /* GET movies by name from TMDB API. */
 router.get('/search/:name', function (req, res) {
-  //format du name : "fight+club"
   const { name } = req.params;
 
   fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&language=fr-FR&query=${name}&include_adult=false`)
